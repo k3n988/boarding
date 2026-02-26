@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "388828720336",
+    "project_id": "boardinghouse-90aeb",
+    "storage_bucket": "boardinghouse-90aeb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388828720336:android:643990c38d01fcfacf82d5",
+        "android_client_info": {
+          "package_name": "com.example.finalboarding"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "388828720336-ivhaq69oklok1rqasojtmqpg7lkvhg9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH6t3LkKYgeosG6lZjEfHWW55jLX0Xyag"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "388828720336-ivhaq69oklok1rqasojtmqpg7lkvhg9h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "388828720336-miikemb6ingn66fb7t5cmi2j3u9pto8u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.finalboarding"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
