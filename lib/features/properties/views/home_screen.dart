@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 // ✅ add this at the top
 import '../viewmodels/home_viewmodel.dart';
 import 'property_detail_screen.dart';

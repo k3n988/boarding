@@ -41,7 +41,6 @@ class _PostingFormState extends State<PostingForm> {
   final TextEditingController _zipCodeController = TextEditingController();
 
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _dailyPriceController = TextEditingController(); // NEW: Daily Price Controller
   final TextEditingController _slotsController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _policiesController = TextEditingController();
@@ -93,7 +92,6 @@ class _PostingFormState extends State<PostingForm> {
     _provinceController.dispose();
     _zipCodeController.dispose();
     _priceController.dispose();
-    _dailyPriceController.dispose(); // NEW: Dispose Daily Price
     _slotsController.dispose();
     _descriptionController.dispose();
     _policiesController.dispose();
@@ -170,13 +168,11 @@ class _PostingFormState extends State<PostingForm> {
     }
 
     try {
-      // FIX: Uncommented dailyPrice and added it directly to the publishListing call
+      // Pass the data cleanly to the ViewModel
       await viewModel.publishListing(
         title: _titleController.text.trim(),
         fullAddress: getFullAddress(),
         price: double.tryParse(_priceController.text.trim().replaceAll(',', '')) ?? 0.0,
-        // 👇 THIS IS THE CRITICAL FIX: Passing the parsed double to dailyPrice
-        dailyPrice: double.tryParse(_dailyPriceController.text.trim().replaceAll(',', '')), 
         availableSlots: int.tryParse(_slotsController.text.trim()) ?? 0,
         category: selectedCategory,
         tenantPreference: selectedGender,
@@ -203,7 +199,6 @@ class _PostingFormState extends State<PostingForm> {
         _provinceController.text = 'Negros Occidental';
         _zipCodeController.clear();
         _priceController.clear();
-        _dailyPriceController.clear(); // Clear Daily Price
         _slotsController.clear();
         _descriptionController.clear();
         _policiesController.clear();
@@ -227,6 +222,7 @@ class _PostingFormState extends State<PostingForm> {
 
   @override
   Widget build(BuildContext context) {
+    // ── Consume the ViewModel so UI updates during loading ──
     return Consumer<PropertyDetailViewModel>(
       builder: (context, viewModel, child) {
         return SingleChildScrollView(
@@ -412,6 +408,7 @@ class _PostingFormState extends State<PostingForm> {
 
               GestureDetector(
                 onTap: () async {
+                  // Ensure they've at least typed a street and city
                   if (_streetController.text.trim().isEmpty || _cityController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please enter at least the Street and City before pinning!')),
@@ -419,6 +416,7 @@ class _PostingFormState extends State<PostingForm> {
                     return;
                   }
 
+                  // ── Pinapasa ang combined text sa map screen ──
                   final fullAddress = getFullAddress();
                   final result = await Navigator.push(
                     context,
@@ -429,6 +427,7 @@ class _PostingFormState extends State<PostingForm> {
                     ),
                   );
 
+                  // ── Handle the returned LatLng object ──
                   if (result != null && result is LatLng) {
                     setState(() {
                       _isLocationPinned = true;
@@ -522,7 +521,7 @@ class _PostingFormState extends State<PostingForm> {
 
               const SizedBox(height: 20),
 
-              // ── NEW: Price & Slots Layout ──────────────────────────────────────
+              // ── Price & Slots ──────────────────────────────────────────────────
               Row(
                 children: [
                   Expanded(
@@ -544,36 +543,17 @@ class _PostingFormState extends State<PostingForm> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Price / Day'),
+                        _buildLabel('Available Slots'),
                         const SizedBox(height: 8),
                         TextField(
-                          controller: _dailyPriceController, // Connected Daily Price
+                          controller: _slotsController,
                           keyboardType: TextInputType.number,
-                          decoration: _inputDecoration('₱ 0'),
+                          decoration: _inputDecoration('e.g. 2'),
                         ),
                       ],
                     ),
                   ),
                 ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Moved Slots down so it doesn't squish the inputs on small screens
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.45,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildLabel('Available Slots'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _slotsController,
-                      keyboardType: TextInputType.number,
-                      decoration: _inputDecoration('e.g. 2'),
-                    ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: 20),

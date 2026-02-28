@@ -1,0 +1,86 @@
+
+import 'models/property_model.dart';
+
+/// Mock property data for development. Replace with API/repository later.
+final List<PropertyModel> mockProperties = [
+  PropertyModel(
+    id: '1',
+    title: 'Sunny Studio Apt',
+    price: 4500.0, 
+    location: 'Mandalagan',
+    imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    description: 'A beautiful and sunny studio apartment perfect for students.',
+    hostId: 'host_001',
+    category: 'Apartment',
+    availableSlots: 1,
+    tenantPreference: 'Any',
+    amenities: ['Wi-Fi', 'Aircon', 'Private Bath'],
+    // FIXED: Changed from a list [...] to a single string '...'
+    policies: 'No smoking, No pets', 
+    imageUrls: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'],
+  ),
+  PropertyModel(
+    id: '2',
+    title: 'Cozy Student Dorm',
+    price: 1200.0,
+    location: 'Lacson St.',
+    imageUrl: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    description: 'Quiet and cozy dorm located near the university.',
+    hostId: 'host_002',
+    category: 'Dorm',
+    availableSlots: 4,
+    tenantPreference: 'Female Only',
+    amenities: ['Wi-Fi', 'Study Area', 'Shared Bath'],
+    // FIXED
+    policies: 'Curfew at 10 PM, Visitors allowed in lounge only',
+    imageUrls: ['https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'],
+  ),
+  PropertyModel(
+    id: '3',
+    title: 'Modern Loft',
+    price: 8500.0,
+    location: 'Lacson St.',
+    imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    description: 'Spacious modern loft with great amenities.',
+    hostId: 'host_003',
+    category: 'Apartment',
+    availableSlots: 2,
+    tenantPreference: 'Any',
+    amenities: ['Wi-Fi', 'Aircon', 'Kitchen', 'Laundry'],
+    // FIXED
+    policies: '1 month advance, 1 month deposit',
+    imageUrls: ['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'],
+  ),
+  PropertyModel(
+    id: '4',
+    title: 'Green View Room',
+    price: 2000.0,
+    location: 'Mandalagan',
+    imageUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    description: 'Affordable boarding house room with a nice view.',
+    hostId: 'host_004',
+    category: 'Boarding House',
+    availableSlots: 2,
+    tenantPreference: 'Male Only',
+    amenities: ['Shared Bath', 'Kitchen'],
+    // FIXED
+    policies: 'Keep common areas clean',
+    imageUrls: ['https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'],
+  ),
+  PropertyModel(
+    id: '5',
+    title: 'Comfortable Bedspace',
+    price: 1500.0,
+    location: 'Alijis',
+    imageUrl: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    description: 'Safe and comfortable bedspace for students.',
+    hostId: 'host_005',
+    category: 'Bedspace',
+    availableSlots: 6,
+    tenantPreference: 'Female Only',
+    amenities: ['Wi-Fi', 'Lounge Area'],
+    // FIXED
+    policies: 'No loud music after 9 PM',
+    imageUrls: ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'],
+  ),
+];
