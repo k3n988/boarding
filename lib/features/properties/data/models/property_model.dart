@@ -4,7 +4,8 @@ class PropertyModel {
   final String? id; // Document ID (null when creating a new one)
   final String title;
   final String location;
-  final double price;
+  final double price; // Monthly price
+  final double? dailyPrice; // NEW: Daily price added here
   final String imageUrl; // Main cover image
   final List<String> imageUrls;
   final String category;
@@ -25,6 +26,7 @@ class PropertyModel {
     required this.title,
     required this.location,
     required this.price,
+    this.dailyPrice, // NEW: Added to constructor
     required this.imageUrl,
     required this.imageUrls,
     required this.category,
@@ -46,6 +48,7 @@ class PropertyModel {
       'title': title,
       'location': location,
       'price': price,
+      'dailyPrice': dailyPrice, // NEW: Added to map for Firestore
       'imageUrl': imageUrl,
       'imageUrls': imageUrls,
       'category': category,
@@ -69,6 +72,8 @@ class PropertyModel {
       title: map['title'] ?? '',
       location: map['location'] ?? '',
       price: (map['price'] ?? 0).toDouble(),
+      // NEW: Retrieve dailyPrice from Firestore (safely handles nulls or ints)
+      dailyPrice: map['dailyPrice'] != null ? (map['dailyPrice'] as num).toDouble() : null,
       imageUrl: map['imageUrl'] ?? '',
       imageUrls: List<String>.from(map['imageUrls'] ?? []),
       category: map['category'] ?? 'Boarding House',

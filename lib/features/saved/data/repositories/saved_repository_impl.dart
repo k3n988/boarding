@@ -12,7 +12,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "4,000",
         rating: "4.5",
         reviewCount: "120",
-        imageUrl: "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Tropical house exterior with greenery (looks like Mandalagan area)
+        imageUrl: "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["WiFi Included"],
       ),
       const SavedItemModel(
@@ -22,7 +23,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "4,500",
         rating: "4.2",
         reviewCount: "85",
-        imageUrl: "https://images.unsplash.com/photo-1522771753014-df7060331667?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Gated residential house (common in Bacolod subdivisions)
+        imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Female Only"],
       ),
     ];
@@ -38,6 +40,7 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "1,500",
         rating: "4.8",
         reviewCount: "340",
+        // Stable image: Wooden bunk beds (Classic student dorm style)
         imageUrl: "https://images.unsplash.com/photo-1555854743-e3c2f6a5fc6b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Walking Distance"],
       ),
@@ -48,6 +51,7 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "2,500",
         rating: "4.0",
         reviewCount: "210",
+        // Stable image: Shared room with study desks
         imageUrl: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Aircon"],
       ),
@@ -64,7 +68,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "9,000",
         rating: "4.9",
         reviewCount: "56",
-        imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Clean studio apartment interior
+        imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Fully Furnished"],
       ),
       const SavedItemModel(
@@ -74,7 +79,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "15,000",
         rating: "5.0",
         reviewCount: "23",
-        imageUrl: "https://images.unsplash.com/photo-1502005229766-939cb4a5ea02?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Modern condo interior (similar to Ayala/Megaworld units)
+        imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Pool Access"],
       ),
     ];
@@ -90,7 +96,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "1,000",
         rating: "3.8",
         reviewCount: "50",
-        imageUrl: "https://images.unsplash.com/photo-1626026909476-80f0891f1ba4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Simple room with modest bed
+        imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Water Free"],
       ),
       const SavedItemModel(
@@ -100,7 +107,8 @@ class SavedRepositoryImpl implements SavedRepository {
         originalPrice: "1,800",
         rating: "4.6",
         reviewCount: "90",
-        imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        // Stable image: Clean, small bedroom space
+        imageUrl: "https://images.unsplash.com/photo-1626026909476-80f0891f1ba4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
         tags: ["Ladies Only"],
       ),
     ];

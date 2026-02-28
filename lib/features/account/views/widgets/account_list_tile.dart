@@ -24,7 +24,8 @@ class AccountListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: Colors.grey[700], size: 24),
+            // Changed icon color to solid black
+            Icon(icon, color: Colors.black, size: 24), 
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -32,21 +33,23 @@ class AccountListTile extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: isDestructive ? Colors.red : Colors.black87,
+                  // Changed text color to solid black (unless destructive)
+                  color: isDestructive ? Colors.red : Colors.black, 
                 ),
               ),
             ),
             if (trailingText != null && trailingText!.isNotEmpty)
               Text(
                 trailingText!,
-                style: TextStyle(
-                  color: Colors.grey[500],
+                style: const TextStyle(
+                  color: Colors.black54, // Kept slightly faded for visual hierarchy, but black-based
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             const SizedBox(width: 8),
-            Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey[400]),
+            // Changed chevron to solid black
+            const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.black), 
           ],
         ),
       ),

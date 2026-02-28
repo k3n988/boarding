@@ -13,6 +13,7 @@ class PropertyDetailViewModel extends ChangeNotifier {
     required String title,
     required String fullAddress,
     required double price,
+    double? dailyPrice, // ── NEW: Added dailyPrice parameter
     required int availableSlots,
     required String category,
     required String tenantPreference,
@@ -47,6 +48,7 @@ class PropertyDetailViewModel extends ChangeNotifier {
         title: title,
         location: fullAddress,
         price: price,
+        dailyPrice: dailyPrice, // ── NEW: Pass dailyPrice to the model
         imageUrl: uploadedImageUrls.first, // First image acts as cover
         imageUrls: uploadedImageUrls,
         category: category,

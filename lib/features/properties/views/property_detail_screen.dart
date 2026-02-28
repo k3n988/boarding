@@ -266,7 +266,67 @@ class PropertyDetailScreen extends StatelessWidget {
 
             _buildSectionDivider(),
 
-            // ── 5. PROPERTY DESCRIPTION ──────────────────────────────────────
+            // ── 5. NEW: LOCATION & SURROUNDINGS ──────────────────────────────
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Location",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text("See map",
+                          style: TextStyle(
+                              color: Colors.blue[700],
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Fake Map Container
+                  Container(
+                    height: 140,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.map, size: 40, color: Colors.black45),
+                          SizedBox(height: 8),
+                          Text("Map View", style: TextStyle(color: Colors.black54)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Simulated Tabs
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildLocationTab("Landmarks", isSelected: true),
+                      _buildLocationTab("Transport", isSelected: false),
+                      _buildLocationTab("Essentials", isSelected: false),
+                    ],
+                  ),
+                  const Divider(height: 24, thickness: 1),
+                  // List of Nearby Places
+                  _buildNearbyPlaceItem(Icons.account_balance, "Barangay Sang Virgen Chapel", "1.38 km"),
+                  _buildNearbyPlaceItem(Icons.park, "Capitol Lagoon Park", "1.94 km"),
+                  _buildNearbyPlaceItem(Icons.local_hospital, "Bacolod Queen of Mercy Hospital", "2.50 km"),
+                  _buildNearbyPlaceItem(Icons.shopping_bag, "SM City Bacolod", "3.10 km"),
+                ],
+              ),
+            ),
+
+            _buildSectionDivider(),
+
+            // ── 6. PROPERTY DESCRIPTION ──────────────────────────────────────
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -292,7 +352,7 @@ class PropertyDetailScreen extends StatelessWidget {
 
             _buildSectionDivider(),
 
-            // ── 6. POLICIES & RULES ──────────────────────────────────────────
+            // ── 7. POLICIES & RULES ──────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -318,7 +378,7 @@ class PropertyDetailScreen extends StatelessWidget {
 
             _buildSectionDivider(),
 
-            // ── 7. HOST PROFILE ──────────────────────────────────────────────
+            // ── 8. HOST PROFILE ──────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -404,15 +464,12 @@ class PropertyDetailScreen extends StatelessWidget {
               ),
             ),
 
-            // ── no FAB, smaller bottom padding ───────────────────────────────
             const SizedBox(height: 24),
           ],
         ),
       ),
 
-      // ── floatingActionButton REMOVED ────────────────────────────────────
-
-      // ── GUEST BOTTOM BAR ─────────────────────────────────────────────────
+      // ── UPDATED: GUEST BOTTOM BAR ──────────────────────────────────────────
       bottomNavigationBar: Container(
         padding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -424,32 +481,48 @@ class PropertyDetailScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.error, color: Colors.red),
-                  SizedBox(width: 12),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Text("Total Price",
+                      style: TextStyle(
+                          color: Colors.grey[600], fontSize: 13)),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text("Sorry, we are",
+                      // NOTE: You can replace '₱5,000' with your property variable
+                      // Example: Text("₱${property.price}", ...)
+                      const Text("₱5,000",
                           style: TextStyle(
-                              color: Colors.red, fontSize: 13)),
-                      Text("Sold out!",
-                          style: TextStyle(
-                              color: Colors.red,
+                              color: Colors.black87,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18)),
+                              fontSize: 20)),
+                      Text(" / month",
+                          style: TextStyle(
+                              color: Colors.grey[600], fontSize: 14)),
                     ],
                   ),
                 ],
               ),
-              Text(
-                "Change Date",
-                style: TextStyle(
-                    color: Colors.blue[700],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Book Now",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
               )
             ],
           ),
@@ -489,6 +562,52 @@ class PropertyDetailScreen extends StatelessWidget {
                     TextStyle(color: Colors.grey[800], fontSize: 13),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── NEW HELPER WIDGETS FOR LOCATION SECTION ────────────────────────────────
+
+  Widget _buildLocationTab(String title, {required bool isSelected}) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.blue[700] : Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        if (isSelected)
+          Container(
+            height: 2,
+            width: 80,
+            color: Colors.blue[700],
+          )
+      ],
+    );
+  }
+
+  Widget _buildNearbyPlaceItem(IconData icon, String name, String distance) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.black87),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              name,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+          Text(
+            distance,
+            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
         ],
       ),
