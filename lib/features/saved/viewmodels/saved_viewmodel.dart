@@ -1,37 +1,59 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
+import '../../properties/data/models/property_model.dart';
 import '../data/models/saved_item_model.dart';
-import '../data/repositories/saved_repository.dart';
-import '../data/repositories/saved_repository_impl.dart';
 
 class SavedViewModel extends ChangeNotifier {
-  final SavedRepository _repository = SavedRepositoryImpl();
+  final Map<String, PropertyModel> _saved = {};
 
-  List<SavedItemModel> _boardingHouseItems = [];
-  List<SavedItemModel> _dormItems = [];
-  List<SavedItemModel> _apartmentItems = [];
-  List<SavedItemModel> _bedspaceItems = [];
+  bool get isEmpty    => _saved.isEmpty;
+  int  get savedCount => _saved.length;
 
-  bool _isLoading = false;
+  bool isSaved(String? propertyId) {
+    if (propertyId == null || propertyId.isEmpty) return false;
+    return _saved.containsKey(propertyId);
+  }
 
-  List<SavedItemModel> get boardingHouseItems => _boardingHouseItems;
-  List<SavedItemModel> get dormItems => _dormItems;
-  List<SavedItemModel> get apartmentItems => _apartmentItems;
-  List<SavedItemModel> get bedspaceItems => _bedspaceItems;
-  bool get isLoading => _isLoading;
+  bool toggle(PropertyModel property) {
+    final id = property.id ?? '';
+    if (id.isEmpty) return false;
+    if (_saved.containsKey(id)) {
+      _saved.remove(id);
+      notifyListeners();
+      return false;
+    } else {
+      _saved[id] = property;
+      notifyListeners();
+      return true;
+    }
+  }
 
-  Future<void> loadSaved() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _boardingHouseItems = await _repository.getSavedBoardingHouses();
-      _dormItems = await _repository.getSavedDorms();
-      _apartmentItems = await _repository.getSavedApartments();
-      _bedspaceItems = await _repository.getSavedBedspaces();
-    } finally {
-      _isLoading = false;
+  void unsaveById(String id) {
+    if (_saved.containsKey(id)) {
+      _saved.remove(id);
       notifyListeners();
     }
   }
+
+  /// Returns the full PropertyModel for navigation — used by SavedScreen.
+  PropertyModel? getById(String id) => _saved[id];
+
+  void clearAll() {
+    _saved.clear();
+    notifyListeners();
+  }
+
+  // ── Filtered lists ────────────────────────────────────────────────────────
+
+  List<SavedItemModel> get _allItems =>
+      _saved.values.map((p) => SavedItemModel.fromProperty(p)).toList();
+
+  List<SavedItemModel> _byType(String type) =>
+      _allItems.where((i) => i.type == type).toList();
+
+  List<SavedItemModel> get allItems           => _allItems;
+  List<SavedItemModel> get boardingHouseItems => _byType('Boarding House');
+  List<SavedItemModel> get dormItems          => _byType('Dormitory');
+  List<SavedItemModel> get apartmentItems     => _byType('Apartment');
+  List<SavedItemModel> get bedspaceItems      => _byType('Bedspace');
 }

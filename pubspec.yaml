@@ -14,6 +14,7 @@ dependencies:
   # UI & Icons
   cupertino_icons: ^1.0.8
   font_awesome_flutter: ^10.8.0
+  google_fonts: ^6.2.1
 
   # State Management
   provider: ^6.1.2
@@ -25,7 +26,7 @@ dependencies:
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4
   google_sign_in: ^6.2.1
-  cloud_firestore: ^6.1.2 
+  cloud_firestore: ^6.1.2
 
   # Storage & Media
   firebase_storage: ^13.0.6
@@ -38,7 +39,7 @@ dependencies:
 
   # Maps & Location
   google_maps_flutter: ^2.10.0
-  geolocator: ^14.0.2
+  geolocator: ^11.0.0
   camera: ^0.11.4
 
 dev_dependencies:
@@ -48,3 +49,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - public/images/logo.png

@@ -13,11 +13,23 @@ class MapViewModel extends ChangeNotifier {
 
   // ── State ──────────────────────────────────────────────────────────────────
   List<MapMarkerModel> _allMarkers = [];
-  List<MapMarkerModel> _filteredMarkers = [];
-  List<MapMarkerModel> get filteredMarkers => _filteredMarkers;
+
+  // mapMarkers  → what the map pins show (only category-filtered, NEVER text-hidden)
+  List<MapMarkerModel> _mapMarkers = [];
+  List<MapMarkerModel> get mapMarkers => _mapMarkers;
+
+  // listMarkers → what the bottom-sheet list shows (category + text filtered)
+  List<MapMarkerModel> _listMarkers = [];
+  List<MapMarkerModel> get listMarkers => _listMarkers;
+
+  // Keep for legacy callers that use filteredMarkers
+  List<MapMarkerModel> get filteredMarkers => _mapMarkers;
 
   String _selectedCategory = 'All';
   String get selectedCategory => _selectedCategory;
+
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
@@ -38,43 +50,71 @@ class MapViewModel extends ChangeNotifier {
     'Bedspace',
   ];
 
-  // ── Init: subscribe to real-time stream ───────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────────────────
   void _init() {
     _isLoading = true;
     _streamSub = _repository.streamPinnedListings().listen(
       (markers) {
         _allMarkers = markers;
-        _applyFilter();
-        _isLoading = false;
+        _applyFilters();
+        _isLoading  = false;
         _errorMessage = null;
         notifyListeners();
       },
       onError: (e) {
-        _isLoading = false;
+        _isLoading    = false;
         _errorMessage = 'Failed to load listings: $e';
         notifyListeners();
       },
     );
   }
 
-  // ── Filter by category ────────────────────────────────────────────────────
+  // ── Category filter (affects map + list) ──────────────────────────────────
   void filterByCategory(String category) {
     _selectedCategory = category;
-    _applyFilter();
+    _applyFilters();
     notifyListeners();
   }
 
-  void _applyFilter() {
-    if (_selectedCategory == 'All') {
-      _filteredMarkers = List.from(_allMarkers);
+  // ── Text search (affects list only — map pins stay visible) ───────────────
+  void filterByText(String query) {
+    _searchQuery = query.trim().toLowerCase();
+    _applyFilters();
+    notifyListeners();
+  }
+
+  void clearTextSearch() {
+    _searchQuery = '';
+    _applyFilters();
+    notifyListeners();
+  }
+
+  void _applyFilters() {
+    // 1. Category filter applies to BOTH map and list
+    final List<MapMarkerModel> categoryFiltered =
+        _selectedCategory == 'All'
+            ? List.from(_allMarkers)
+            : _allMarkers
+                .where((m) => m.category == _selectedCategory)
+                .toList();
+
+    // 2. Map always shows category-filtered markers (text search does NOT hide pins)
+    _mapMarkers = categoryFiltered;
+
+    // 3. List additionally applies text search (title / location / category)
+    if (_searchQuery.isEmpty) {
+      _listMarkers = categoryFiltered;
     } else {
-      _filteredMarkers = _allMarkers
-          .where((m) => m.category == _selectedCategory)
-          .toList();
+      _listMarkers = categoryFiltered.where((m) {
+        return m.title.toLowerCase().contains(_searchQuery) ||
+            m.location.toLowerCase().contains(_searchQuery) ||
+            m.category.toLowerCase().contains(_searchQuery) ||
+            m.tenantPreference.toLowerCase().contains(_searchQuery);
+      }).toList();
     }
   }
 
-  // ── Select / deselect a marker ────────────────────────────────────────────
+  // ── Marker selection ──────────────────────────────────────────────────────
   void selectMarker(MapMarkerModel? marker) {
     _selectedMarker = marker;
     notifyListeners();
@@ -91,8 +131,8 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final markers = await _repository.fetchPinnedListings();
-      _allMarkers = markers;
-      _applyFilter();
+      _allMarkers   = markers;
+      _applyFilters();
       _errorMessage = null;
     } catch (e) {
       _errorMessage = 'Refresh failed: $e';

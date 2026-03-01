@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // ── ViewModels ──────────────────────────────────────────────
 import '../viewmodels/account_viewmodel.dart';
-import '../../auth/viewmodels/auth_viewmodel.dart'; 
+import '../../auth/viewmodels/auth_viewmodel.dart';
 
 // ── Widgets ─────────────────────────────────────────────────
 import 'widgets/account_list_tile.dart';
-import 'widgets/profile_avatar.dart'; // Added the import for your Avatar
+import 'widgets/profile_avatar.dart';
+
+// ─── Rently Brand Colors ─────────────────────────────────────
+class _R {
+  static const navy       = Color(0xFF1B2A6B);
+  static const green      = Color(0xFF2EB85C);
+  static const greenDark  = Color(0xFF1E9448);
+  static const greenLight = Color(0xFFE8F8EE);
+  static const gold       = Color(0xFFE8A020);
+  static const bg         = Color(0xFFF7F9FC);
+  static const divider    = Color(0xFFE8EDF2);
+  static const textMain   = Color(0xFF0D1B3E);
+  static const textSub    = Color(0xFF6B7A99);
+}
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -17,7 +31,7 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  
+
   @override
   void initState() {
     super.initState();
@@ -29,69 +43,70 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
+      backgroundColor: _R.bg,
       body: Consumer<AccountViewModel>(
         builder: (context, viewModel, _) {
-          // Optional: We removed the full-screen loading indicator here 
-          // so the user can still see their screen while the image uploads.
-          
-          // Uses the real first name from your UserModel
-          final String displayFirstName = viewModel.firstName.isNotEmpty 
-              ? viewModel.firstName 
+          final String displayFirstName = viewModel.firstName.isNotEmpty
+              ? viewModel.firstName
               : 'User';
 
           return Column(
             children: [
-              // ─── Header matching your screenshot + Avatar ─────────
+              // ─── Header ──────────────────────────────────────────
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 30),
+                padding: const EdgeInsets.only(
+                    top: 60, left: 20, right: 20, bottom: 30),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF8C5338), // The brown color
+                  // Navy → Green gradient matching Rently logo
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [_R.navy, _R.green],
+                  ),
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(24),
-                    bottomRight: Radius.circular(24),
+                    bottomLeft:  Radius.circular(28),
+                    bottomRight: Radius.circular(28),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // ─── Left Side: Avatar & Text ───
+                    // ─── Left: Avatar & Text ───
                     Expanded(
                       child: Row(
                         children: [
-                          // Added Opacity to give visual feedback when uploading
                           Opacity(
                             opacity: viewModel.isLoading ? 0.5 : 1.0,
                             child: ProfileAvatar(
-                              // Uses the URL straight from Firebase via ViewModel
-                              imageUrl: viewModel.photoUrl, 
-                              radius: 26,
-                              // Calls the upload function directly from the ViewModel
-                              onEditTap: () => viewModel.uploadProfilePicture(), 
+                              imageUrl: viewModel.photoUrl,
+                              radius: 28,
+                              onEditTap: () =>
+                                  viewModel.uploadProfilePicture(),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Welcome, $displayFirstName",
-                                  style: const TextStyle(
+                                  style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  overflow: TextOverflow.ellipsis, // Prevents overflow if name is long
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 3),
                                 Text(
                                   viewModel.email,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(0.75),
                                     fontSize: 13,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -102,22 +117,25 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // ─── Right Side: Custom Slanted VIP Badge ───
+                    // ─── Right: VIP Badge ───
                     _VipBadge(tier: viewModel.vipTier),
                   ],
                 ),
               ),
-              
+
               // ─── Scrollable Body ──────────────────────────────────
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 20),
                   child: Column(
                     children: [
-                      // Show a tiny progress bar if uploading
                       if (viewModel.isLoading) ...[
-                         const LinearProgressIndicator(),
-                         const SizedBox(height: 16),
+                        LinearProgressIndicator(
+                          color: _R.green,
+                          backgroundColor: _R.greenLight,
+                        ),
+                        const SizedBox(height: 16),
                       ],
                       _RewardsCard(viewModel: viewModel),
                       const SizedBox(height: 16),
@@ -127,7 +145,8 @@ class _AccountScreenState extends State<AccountScreen> {
                       const SizedBox(height: 30),
                       Text(
                         "Version ${viewModel.appVersion}",
-                        style: const TextStyle(color: Colors.grey),
+                        style: GoogleFonts.poppins(
+                            color: _R.textSub, fontSize: 13),
                       ),
                       const SizedBox(height: 30),
                     ],
@@ -142,7 +161,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 }
 
-// ─── Custom Widget for the Slanted VIP Badge ────────────────────
+// ─── VIP Badge ───────────────────────────────────────────────
 class _VipBadge extends StatelessWidget {
   final String tier;
   const _VipBadge({required this.tier});
@@ -150,46 +169,48 @@ class _VipBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 28,
+      height: 30,
       decoration: BoxDecoration(
-        color: const Color(0xFFD39369), // Bronze color
-        borderRadius: BorderRadius.circular(4),
+        // Gold tone for badge body — matches logo's keyhole accent
+        color: const Color(0xFFE8A020).withOpacity(0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE8A020).withOpacity(0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Black section with the slant
           ClipPath(
             clipper: _VipSlantClipper(),
             child: Container(
-              color: const Color(0xFF2C2E3E), // Dark blue/black color
-              padding: const EdgeInsets.only(left: 8, right: 16),
+              color: Colors.white.withOpacity(0.15),
+              padding:
+                  const EdgeInsets.only(left: 8, right: 16),
               alignment: Alignment.center,
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.star, color: Colors.white, size: 14),
-                  SizedBox(width: 4),
+                  const Icon(Icons.star_rounded,
+                      color: _R.gold, size: 14),
+                  const SizedBox(width: 4),
                   Text(
                     "VIP",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          // Tier text
           Padding(
             padding: const EdgeInsets.only(left: 2, right: 10),
             child: Text(
               tier,
-              style: const TextStyle(
-                color: Colors.black87,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -199,14 +220,13 @@ class _VipBadge extends StatelessWidget {
   }
 }
 
-// Clipper to create the slanted edge on the VIP badge
 class _VipSlantClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.lineTo(size.width, 0); // Top right
-    path.lineTo(size.width - 10, size.height); // Bottom right (shifted left for slant)
-    path.lineTo(0, size.height); // Bottom left
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width - 10, size.height);
+    path.lineTo(0, size.height);
     path.close();
     return path;
   }
@@ -215,157 +235,145 @@ class _VipSlantClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
-// ─── Cards Below ───────────────────────────────
+// ─── Section card helper ──────────────────────────────────────
+Widget _sectionCard({required String title, required List<Widget> children}) {
+  return Container(
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF1B2A6B).withOpacity(0.05),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF6B7A99),
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
+        ...children,
+        const SizedBox(height: 10),
+      ],
+    ),
+  );
+}
 
+// ─── Rewards Card ─────────────────────────────────────────────
 class _RewardsCard extends StatelessWidget {
   final AccountViewModel viewModel;
-
   const _RewardsCard({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: Text(
-              "Reward and savings",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          const AccountListTile(
-            icon: Icons.confirmation_num_outlined,
-            title: "Coupons",
-            trailingText: "",
-          ),
-          const Divider(height: 1, indent: 60, endIndent: 20),
-          AccountListTile(
-            icon: Icons.savings_outlined,
-            title: "Cashback Rewards",
-            trailingText: viewModel.cashbackAmount,
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
+    return _sectionCard(
+      title: 'Reward and savings',
+      children: [
+        const AccountListTile(
+          icon: Icons.confirmation_num_outlined,
+          title: "Coupons",
+          trailingText: "",
+        ),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        AccountListTile(
+          icon: Icons.savings_outlined,
+          title: "Cashback Rewards",
+          trailingText: viewModel.cashbackAmount,
+        ),
+      ],
     );
   }
 }
 
+// ─── My Account Card ──────────────────────────────────────────
 class _MyAccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: Text(
-              "My account",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          const AccountListTile(icon: Icons.person_outline, title: "Profile"),
-          const AccountListTile(
-            icon: Icons.chat_bubble_outline,
-            title: "Property messages",
-          ),
-          const AccountListTile(icon: Icons.favorite_border, title: "Saved"),
-          const AccountListTile(
-            icon: Icons.credit_card,
-            title: "My saved cards",
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
+    return _sectionCard(
+      title: 'My account',
+      children: [
+        const AccountListTile(icon: Icons.person_outline, title: "Profile"),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        const AccountListTile(
+          icon: Icons.chat_bubble_outline,
+          title: "Property messages",
+        ),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        const AccountListTile(
+            icon: Icons.favorite_border, title: "Saved"),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        const AccountListTile(
+          icon: Icons.credit_card,
+          title: "My saved cards",
+        ),
+      ],
     );
   }
 }
 
+// ─── Settings Card ────────────────────────────────────────────
 class _SettingsCard extends StatelessWidget {
   final AccountViewModel viewModel;
-
   const _SettingsCard({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: Text(
-              "Settings",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+    return _sectionCard(
+      title: 'Settings',
+      children: [
+        AccountListTile(
+          icon: Icons.language,
+          title: "Language",
+          trailingText: viewModel.language,
+        ),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        AccountListTile(
+          icon: Icons.price_change_outlined,
+          title: "Price display",
+          trailingText: viewModel.priceDisplay,
+        ),
+        Divider(height: 1, indent: 60, endIndent: 20,
+            color: const Color(0xFFE8EDF2)),
+        AccountListTile(
+          icon: Icons.logout,
+          title: "Sign out",
+          isDestructive: true,
+          onTap: () async {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Logging out...',
+                    style: GoogleFonts.poppins(fontSize: 13)),
+                backgroundColor: const Color(0xFF1B2A6B),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                margin:
+                    const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                duration: const Duration(seconds: 1),
               ),
-            ),
-          ),
-          AccountListTile(
-            icon: Icons.language,
-            title: "Language",
-            trailingText: viewModel.language,
-          ),
-          AccountListTile(
-            icon: Icons.price_change_outlined,
-            title: "Price display",
-            trailingText: viewModel.priceDisplay,
-          ),
-          
-          // ─── Sign Out Button ─────────────────────────────────
-          AccountListTile(
-            icon: Icons.logout,
-            title: "Sign out",
-            isDestructive: true,
-            onTap: () async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logging out...'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-              
-              await context.read<AuthViewModel>().logout();
-            },
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
+            );
+            await context.read<AuthViewModel>().logout();
+          },
+        ),
+      ],
     );
   }
 }
