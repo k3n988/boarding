@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../data/models/property_model.dart';
-// ── PATCH: Add this import at the top of property_detail_screen.dart ──────────
 import '../../bookings/views/booking_screen.dart';
 
 // ── Simple model to hold fetched host data ────────────────────────────────────
@@ -26,6 +26,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   // ── Host profile state ────────────────────────────────────────────────────
   _HostProfile? _hostProfile;
   bool _hostLoading = true;
+
+  // ── Google Map ────────────────────────────────────────────────────────────
+  GoogleMapController? _mapController;
+  bool _mapExpanded = false;
+
+  // Bacolod City fallback coordinates
+  static const double _defaultLat = 10.6840;
+  static const double _defaultLng = 122.9560;
 
   // ── Location tab state ────────────────────────────────────────────────────
   int _selectedLocationTab = 0;
@@ -457,72 +465,69 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       const Text('Location',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
-                      Text('See map',
+                      GestureDetector(
+                        onTap: () =>
+                            setState(() => _mapExpanded = !_mapExpanded),
+                        child: Text(
+                          _mapExpanded ? 'Collapse' : 'See map',
                           style: TextStyle(
                               color: Colors.blue[700],
                               fontWeight: FontWeight.bold)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
+
+                  // ── Location score + address card ──────────────────────
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.grey[50],
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
-                    child: Row(
-                      children: [
-                        ClipRRect(
+                    child: Row(children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            width: 72,
-                            height: 72,
-                            color: Colors.green.shade100,
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Icon(Icons.map,
-                                      size: 36, color: Colors.green.shade700),
-                                ),
-                                Positioned(
-                                  bottom: 4,
-                                  right: 4,
-                                  child: Icon(Icons.open_in_full,
-                                      size: 14, color: Colors.blue.shade700),
-                                ),
-                              ],
+                        ),
+                        child: Icon(Icons.location_on,
+                            color: Colors.blue.shade700, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('8.8 Excellent',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: Colors.blue)),
+                            const Text('Location rating score',
+                                style: TextStyle(
+                                    fontSize: 11, color: Colors.grey)),
+                            const SizedBox(height: 4),
+                            Text(
+                              property.location,
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.black87),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('8.8 Excellent',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: Colors.blue)),
-                              const Text('Location rating score',
-                                  style:
-                                      TextStyle(fontSize: 11, color: Colors.grey)),
-                              const SizedBox(height: 6),
-                              Text(
-                                property.location,
-                                style: const TextStyle(
-                                    fontSize: 13, color: Colors.black87),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+
+                  // ── Interactive Google Map ─────────────────────────────
+                  _buildPropertyMap(property),
+                  const SizedBox(height: 8),
 
                   // Tabs
                   Row(
@@ -840,6 +845,189 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
+
+  // ── dispose ───────────────────────────────────────────────────────────────
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  // ── Interactive property map ───────────────────────────────────────────────
+  Widget _buildPropertyMap(PropertyModel property) {
+    final double lat = property.latitude ?? _defaultLat;
+    final double lng = property.longitude ?? _defaultLng;
+    final bool hasPinnedLocation = property.isLocationPinned &&
+        property.latitude != null &&
+        property.longitude != null;
+
+    final LatLng position = LatLng(lat, lng);
+
+    final Set<Marker> markers = {
+      Marker(
+        markerId: const MarkerId('property'),
+        position: position,
+        infoWindow: InfoWindow(
+          title: property.title,
+          snippet: property.location,
+        ),
+      ),
+    };
+
+    // Collapsed height: 180 — expanded: 320
+    final double mapHeight = _mapExpanded ? 320 : 180;
+
+    return Column(
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: mapHeight,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: position,
+                    zoom: 15.5,
+                  ),
+                  markers: markers,
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                    // Apply a subtle light style if needed
+                  },
+                  zoomControlsEnabled: false,
+                  mapToolbarEnabled: false,
+                  myLocationButtonEnabled: false,
+                  scrollGesturesEnabled: _mapExpanded,
+                  zoomGesturesEnabled: _mapExpanded,
+                  rotateGesturesEnabled: false,
+                  tiltGesturesEnabled: false,
+                  liteModeEnabled: !_mapExpanded, // lite mode when collapsed
+                ),
+
+                // ── "Not pinned" overlay ─────────────────────────────────
+                if (!hasPinnedLocation)
+                  Positioned(
+                    bottom: 10, left: 0, right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade700,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.info_outline,
+                                color: Colors.white, size: 14),
+                            SizedBox(width: 6),
+                            Text('Approximate location',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // ── Expand / collapse tap layer (collapsed only) ─────────
+                if (!_mapExpanded)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _mapExpanded = true),
+                      child: Container(color: Colors.transparent),
+                    ),
+                  ),
+
+                // ── Zoom-in pill (expanded mode) ─────────────────────────
+                if (_mapExpanded)
+                  Positioned(
+                    top: 10, right: 10,
+                    child: Column(children: [
+                      _mapIconBtn(
+                        Icons.add,
+                        () => _mapController?.animateCamera(
+                            CameraUpdate.zoomIn()),
+                      ),
+                      const SizedBox(height: 6),
+                      _mapIconBtn(
+                        Icons.remove,
+                        () => _mapController?.animateCamera(
+                            CameraUpdate.zoomOut()),
+                      ),
+                      const SizedBox(height: 6),
+                      _mapIconBtn(
+                        Icons.my_location,
+                        () => _mapController?.animateCamera(
+                          CameraUpdate.newLatLngZoom(position, 15.5),
+                        ),
+                      ),
+                    ]),
+                  ),
+              ],
+            ),
+          ),
+        ),
+
+        // ── Open in Maps external link ─────────────────────────────────
+        if (_mapExpanded) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () {
+              // Opens Google Maps externally — requires url_launcher
+              // launch('https://maps.google.com/?q=$lat,$lng');
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.open_in_new,
+                    size: 14, color: Colors.blue[700]),
+                const SizedBox(width: 4),
+                Text('Open in Google Maps',
+                    style: TextStyle(
+                        color: Colors.blue[700],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _mapIconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 34, height: 34,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Icon(icon, size: 18, color: Colors.black87),
+        ),
+      );
 
   String _formatPrice(double price) {
     final int intPart = price.truncate();
